@@ -1,0 +1,413 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// model User {
+//   id               Int     @id @default(autoincrement())
+//   name             String     @db.VarChar(191)
+//   role             String     @db.VarChar(250)
+//   email            String     @db.VarChar(191)
+//   emailVerifiedAt  DateTime?  @db.Timestamp(0)  
+//   password         String     @db.Text
+//   isAdmin          Boolean    @default(false) 
+//   status           String     @db.VarChar(200) @default("inactive")
+//   contact          String     @db.VarChar(12)
+//   rememberToken    String?    @db.VarChar(100)
+//   refId            String?    @db.VarChar(20)
+//   point            Int        @default(0)
+//   createdAt        DateTime?  @db.Timestamp(0)
+//   underRefId       String?    @db.VarChar(20)
+//   updatedAt        DateTime?  @db.Timestamp(0)
+
+//   @@map("users")
+// }
+
+// model Cart {
+//   id        Int      @id @default(autoincrement()) 
+//   userId    Int      
+//   productId Int
+//   quantity  Int   
+//   price     Decimal   
+//   createdAt DateTime? @default(now())
+//   updatedAt DateTime  @updatedAt
+
+//   user    Register    @relation(fields: [userId], references: [id], name: "UserToCart")
+//   // product   Product  @relation("ProductToCart", fields: [productId], references: [id])
+
+//   @@unique([userId, productId])
+
+//   @@map("cart")
+// }
+
+enum Role {
+  USER
+  ADMIN
+}
+
+model register {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String  @unique
+  password String
+  contact  String  @unique
+  role     String  @default("USER")
+  product Product[]
+  inward Inward[]
+
+  @@map("registers") // maps model to actual table name
+}
+
+model Product {
+  id                  Int    @id @default(autoincrement()) 
+  createdAt           DateTime? @default(now())
+  updatedAt           DateTime? @updatedAt
+  cid                 String    
+  name                String    
+  mrp                 String    
+  image               String   
+  shortDesc           String    
+  fullDesc            String    
+  ratings             String?   @default("0")
+  purchaseRateWoGst   String   
+  purchaseRateWGst    String   
+  salingRateWoGst     String   
+  sellingRateWGst     String   
+  discount            String   
+  gst                 String   
+  profit              String?  @default("0")
+  points              String   
+  gram                String    
+  weight              Int       
+  status              String    
+  productSrno         Int       @default(0) 
+
+  userId Int
+  user register @relation(fields: [userId], references: [id])
+  inward Inward[]
+
+  // carts             Cart[]    @relation("ProductToCart")
+
+  @@map("products")
+}
+
+model Inward {
+  id                 Int    @id @default(autoincrement()) 
+  qty                Int    
+  price              String?   
+  mrp                String?   
+  purchaseWithGst    String?   
+  purchaseWithoutGst String?   
+  gst                String?   
+  createdAt          DateTime @default(now()) 
+  updatedAt          DateTime @updatedAt
+
+  userId             Int 
+  user               register @relation(fields: [userId], references: [id])
+  productId         Int
+  product           Product @relation(fields: [productId], references: [id])   
+  @@map("inwards")
+}
+
+model Stock {
+  id         Int     @id @default(autoincrement()) 
+  pid        String     
+  price      String     
+  totalQty   String     
+  // numPcs     String?    
+  // numBox     String?    
+  // pcsBox     String?    
+  // batch      String?    
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@map("stocks")
+  @@unique([id,pid])
+}
+
+// model SliderImage {
+//   id         Int     @id @default(autoincrement()) 
+//   images     String     @db.VarChar(191)
+//   createdAt  DateTime?  @db.Timestamp(0)
+//   updatedAt  DateTime?  @db.Timestamp(0)
+
+//   @@map("sliderimages")
+// }
+
+// model PurchaseReport {
+//   id              Int     @id @db.Int
+//   purchaseDate    String? @db.VarChar(10)
+//   invoiceNo       String? @db.VarChar(100)
+//   invoiceAmount   Int?    @db.Int
+//   vendorName      String? @db.Text
+//   withoutTax      String  @db.VarChar(200)
+//   gstTax          String  @db.VarChar(200)
+//   createdAt       String? @db.VarChar(19)
+//   updatedAt       String? @db.VarChar(19)
+
+//   @@map("purchase_reports")
+// }
+
+// model Profile {
+//   id            Int     @id @db.Int
+//   name          String? @db.VarChar(400)
+//   address       String? @db.Text
+//   landMark      String? @db.Text
+//   pincode       String? @db.VarChar(10)
+//   mobileNo      String? @db.VarChar(20)
+//   acHoldername  String? @db.VarChar(26)
+//   accountNo     String? @db.VarChar(50)
+//   ifscCode      String? @db.VarChar(100)
+//   bankName      String? @db.VarChar(100)
+//   branch        String? @db.VarChar(200)
+//   emailId       String? @db.VarChar(100)
+//   userId        String? @db.VarChar(100)
+//   createdAt     String? @db.VarChar(19)
+//   updatedAt     String? @db.VarChar(19)
+
+//   @@map("profiles")
+// }
+
+// model PersonalAccessToken {
+//   id            Int     @id @default(autoincrement()) 
+//   tokenableType String     @db.VarChar(191)
+//   tokenableId   Int     
+//   name          String     @db.VarChar(191)
+//   token         String     @db.VarChar(64)
+//   abilities     String?    @db.Text
+//   lastUsedAt    DateTime?  @db.Timestamp(0)
+//   createdAt     DateTime?  @db.Timestamp(0)
+//   updatedAt     DateTime?  @db.Timestamp(0)
+
+//   @@map("personal_access_tokens")
+// }
+
+// model Payment {
+//   id         Int    @id @default(autoincrement()) @db.Int
+//   profileId  String    @db.VarChar(20)
+//   accName    String    @db.Text
+//   accNo      String    @db.VarChar(50)
+//   accIfsc    String    @db.VarChar(20)
+//   accBank    String    @db.VarChar(20)
+//   accBranch  String    @db.VarChar(20)
+//   amount     String    @db.VarChar(20)
+//   status     String    @default("pending") @db.VarChar(20)
+//   txnId      String?   @db.VarChar(20)
+//   txnDate    String?   @db.VarChar(20)
+//   createdAt  DateTime  @default(now()) @db.DateTime(0)
+
+//   @@map("payments")
+// }
+
+// model PasswordReset {
+//   email      String    @db.VarChar(191)
+//   token      String    @db.VarChar(191)
+//   createdAt  DateTime? @db.Timestamp(0)
+
+//   @@id([email, token])
+//   @@map("password_resets")
+// }
+
+// model OrderDelivery {
+//   id         Int     @id @default(autoincrement()) 
+//   orderId    String     @db.VarChar(191)
+//   ewaybill   String     @db.Text
+//   trackingId String     @db.Text
+//   createdAt  DateTime?  @db.Timestamp(0)
+//   updatedAt  DateTime?  @db.Timestamp(0)
+
+//   @@map("order_delieveries")
+// }
+
+// model OrderActivity {
+//   id         Int     @id @default(autoincrement()) 
+//   billId     String     @db.VarChar(191)
+//   status     String     @db.VarChar(191)
+//   createdAt  DateTime?  @db.Timestamp(0)
+//   updatedAt  DateTime?  @db.Timestamp(0)
+
+//   @@map("order_activities")
+// }
+
+// model Order {
+//   id         Int     @id @default(autoincrement()) 
+//   bid        String     @db.VarChar(191)
+//   pid        String     @db.VarChar(191)
+//   price      String     @db.VarChar(191)
+//   disc       String?    @db.VarChar(191)
+//   qty        String     @db.VarChar(191)
+//   total      String     @db.VarChar(191)
+//   createdAt  DateTime?  @db.Timestamp(0)
+//   updatedAt  DateTime?  @db.Timestamp(0)
+
+//   @@map("orders")
+// }
+
+// model Migration {
+//   id        Int     @id @default(autoincrement()) @db.UnsignedInt
+//   migration String  @db.VarChar(191)
+//   batch     Int     @db.Int
+
+//   @@map("migrations")
+// }
+
+// model FailedJob {
+//   id         Int    @id @default(autoincrement()) 
+//   uuid       String    @db.VarChar(191)
+//   connection String    @db.Text
+//   queue      String    @db.Text
+//   payload    String    @db.LongText
+//   exception  String    @db.LongText
+//   failedAt   DateTime  @default(now()) @db.Timestamp(0)
+
+//   @@map("failed_jobs")
+// }
+
+// model Enquiry {
+//   id        Int    @id @default(autoincrement()) 
+//   name      String    @db.VarChar(191)
+//   surname   String    @db.VarChar(191)
+//   email     String    @db.VarChar(191)
+//   contact   String    @db.VarChar(191)
+//   message   String    @db.Text
+//   createdAt DateTime? @db.Timestamp(0)
+//   updatedAt DateTime? @db.Timestamp(0)
+
+//   @@map("enquiries")
+// }
+
+// model Earning {
+//   id        Int    @id @default(autoincrement()) 
+//   userId    String    @db.VarChar(20)
+//   payerId   String    @db.VarChar(20)
+//   amount    String    @db.VarChar(20)
+//   level     String?   @db.VarChar(20)
+//   status    String    @default("pending") @db.VarChar(20)
+//   createdAt DateTime  @default(now()) @db.DateTime(0)
+
+//   @@map("earnings")
+// }
+
+// model DeliveryTrack {
+//   id                Int    @id @default(autoincrement()) 
+//   orderDeliveryId   String    @db.VarChar(191)
+//   currentStatus     String    @db.Text
+//   createdAt         DateTime? @db.Timestamp(0)
+//   updatedAt         DateTime? @db.Timestamp(0)
+
+//   @@map("delievery_tracks")
+// }
+
+// model Customer {
+//   id        Int    @id @default(autoincrement()) 
+//   name      String    @db.VarChar(191)
+//   email     String    @db.VarChar(200)
+//   address   String?   @db.VarChar(191)
+//   city      String?   @db.VarChar(191)
+//   state     String?   @db.VarChar(191)
+//   zipcode   String?   @db.VarChar(191)
+//   district  String?   @db.VarChar(191)
+//   contact   String?   @db.VarChar(191)
+//   createdAt DateTime? @db.Timestamp(0)
+//   updatedAt DateTime? @db.Timestamp(0)
+
+//   @@map("customers")
+// }
+
+// model Contact {
+//   id        Int    @id @default(autoincrement()) 
+//   name      String    @db.VarChar(191)
+//   email     String    @db.VarChar(191)
+//   subject   String    @db.VarChar(191)
+//   message   String    @db.Text
+//   createdAt DateTime? @db.Timestamp(0)
+//   updatedAt DateTime? @db.Timestamp(0)  
+
+//   @@map("contacts")
+// }
+
+// model Category {
+//   id        Int    @id @default(autoincrement()) 
+//   createdAt DateTime? @db.Timestamp(0)
+//   updatedAt DateTime? @db.Timestamp(0)
+//   name      String    @db.VarChar(191)
+//   image     String    @db.VarChar(191)
+//   status    String    @db.VarChar(191)
+
+//   @@map("categories")
+// }
+
+// model BuntyExpense {
+//   id                Int    @id @default(autoincrement()) 
+//   date              String    @db.VarChar(191)
+//   month             String    @db.VarChar(191)
+//   salary            String    @db.VarChar(191)
+//   rent              String    @db.VarChar(191)
+//   wifi              String    @db.VarChar(191)
+//   stationary        String    @db.VarChar(191)
+//   water             String    @db.VarChar(191)
+//   electricity       String    @db.VarChar(191)
+//   packingMaterial   String    @db.VarChar(191)
+//   courierCharges    String    @db.VarChar(191)
+//   accountingExp     String    @db.VarChar(191)
+//   officeExpenses    String    @db.VarChar(191)
+//   promotionalExp    String    @db.VarChar(191)
+//   total             String    @db.VarChar(191)
+//   createdAt         DateTime? @db.Timestamp(0)
+//   updatedAt         DateTime? @db.Timestamp(0)
+
+//   @@map("bunty_expenses")
+// }
+
+// model Bill {
+//   id               Int    @id @default(autoincrement()) 
+//   cid              String    @db.VarChar(191)
+//   billAmount       String    @db.VarChar(191)
+//   billDiscount     String    @db.VarChar(191)
+//   billDate         String    @db.VarChar(191)
+//   payMode          String    @db.VarChar(191)
+//   deliveryStatus   String    @db.VarChar(191)
+//   billStatus       String    @db.VarChar(191)
+//   exhStatus        String    @db.VarChar(191)
+//   billId           String    @db.VarChar(150)
+//   status           String    @db.VarChar(200)
+//   createdAt        DateTime? @db.Timestamp(0)
+//   updatedAt        DateTime? @db.Timestamp(0)
+//   fullName         String    @db.VarChar(200)
+//   email            String    @db.VarChar(200)
+//   contact          Int    
+//   city             String    @db.VarChar(200)
+//   district         String    @db.VarChar(200)
+//   address          String    @db.Text
+//   zipcode          String    @db.VarChar(200)
+//   totalGrams       String?   @db.VarChar(200)
+//   printStatus      String    @default("no") @db.VarChar(20)
+
+//   @@map("bills")
+// }
+
+// model BillDetail {
+//   id        Int    @id @default(autoincrement()) 
+//   fullName  String    @db.VarChar(191)
+//   email     String    @db.VarChar(191)
+//   contact   String    @db.VarChar(191)
+//   city      String    @db.VarChar(191)
+//   district  String    @db.VarChar(191)
+//   address   String    @db.VarChar(191)
+//   zipcode   String    @db.VarChar(191)
+//   createdAt DateTime? @db.Timestamp(0)
+//   updatedAt DateTime? @db.Timestamp(0)
+
+//   @@map("billdetails")
+// }
