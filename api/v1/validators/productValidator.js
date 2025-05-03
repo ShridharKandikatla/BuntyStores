@@ -25,23 +25,17 @@ const productSchema = Joi.object({
   productSrno: Joi.number().default(0),
 });
 
-const updateProductValidation = async (req, res, next) => {
-  try {
-    const decoded = await verifyToken(req.headers.authorization.split(" ")[1]);
-    req.userId = decoded.id;
-    req.role = decoded.role;
-    if (decoded.role !== "ADMIN") {
-      return res.status(403).json({ error: "Forbidden" });
-    }
-  } catch (error) {
-    return res.status(401).json({ error: "Unauthorized" });
-  }
-  const { error } = productSchema.validate(req.body || {});
+const idSchema = Joi.object({
+  id: Joi.number().integer().required(),
+});
+
+const idSchemaValidation = async (req, res, next) => {
+  const { error } = idSchema.validate(req.params || {});
   if (error) return res.status(400).json({ error: error.details[0].message });
   next();
-};
+}
 
-const createProductValidation = async (req, res, next) => {
+const productValidation = async (req, res, next) => {
   try {
     const decoded = await verifyToken(req.headers.authorization.split(" ")[1]);
     req.userId = decoded.id;
@@ -58,6 +52,6 @@ const createProductValidation = async (req, res, next) => {
 };
 
 module.exports = {
-  createProductValidation,
-  updateProductValidation,
+  productValidation,
+  idSchemaValidation,
 };

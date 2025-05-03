@@ -13,9 +13,9 @@ const addInward = async (req, res) => {
 };
 
 const updateInward = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const inward = await prisma.inward.update({
-    where: { id },
+    where: { id: parseInt(id) },
     data: { ...req.body, userId: req.userId },
   });
   res.status(200).json(inward);
@@ -27,9 +27,9 @@ const updateInward = async (req, res) => {
 };
 
 const deleteInward = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   await prisma.inward.delete({
-    where: { id },
+    where: { id: parseInt(id) },
   });
   res.status(200).json({ message: "Inward deleted successfully" });
   try {
@@ -40,9 +40,9 @@ const deleteInward = async (req, res) => {
 };
 
 const getInwardById = async (req, res) => {
-  const { id } = req.body;
+  const { id } = req.params;
   const inward = await prisma.inward.findUnique({
-    where: { id },
+    where: { id: parseInt(id) },
   });
   res.status(200).json(inward);
   try {

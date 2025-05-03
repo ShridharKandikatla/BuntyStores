@@ -1,9 +1,5 @@
 const express = require("express");
-const {
-  addInwardValidation,
-  updateInwardValidation,
-  deleteInwardValidation,
-} = require("../validators/inwardValidator");
+const { InwardValidation } = require("../validators/inwardValidator");
 const {
   addInward,
   updateInward,
@@ -14,10 +10,10 @@ const {
 
 const router = express.Router();
 
-router.post("/addInward", addInwardValidation, addInward);
-router.post("/updateInward", updateInwardValidation, updateInward);
-router.post("/deleteInward", deleteInwardValidation, deleteInward);
-router.get("/getInwardById", deleteInwardValidation, getInwardById);
+router.post("/addInward", InwardValidation, addInward);
+router.post("/updateInward/:id", InwardValidation, updateInward);
+router.post("/deleteInward/:id", deleteInward);
+router.get("/getInwardById/:id", getInwardById);
 router.get("/getAllInwards", getAllInwards);
 
 module.exports = router;

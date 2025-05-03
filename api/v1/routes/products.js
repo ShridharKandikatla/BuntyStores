@@ -7,16 +7,21 @@ const {
   getProduct,
 } = require("../controllers/productsController");
 const {
-  createProductValidation,
-  updateProductValidation,
+  idSchemaValidation,
+  productValidation,
 } = require("../validators/productValidator");
 
 const router = express.Router();
 
-router.post("/product", createProductValidation, createProduct);
+router.post("/product", productValidation, createProduct);
 router.get("/product", getProduct);
 router.get("/products", getAllProducts);
-router.get("/product/:id", getProductById);
-router.put("/product/:id", updateProductValidation, updateProduct);
+router.get("/product/:id", idSchemaValidation, getProductById);
+router.put(
+  "/product/:id",
+  idSchemaValidation,
+  productValidation,
+  updateProduct
+);
 
 module.exports = router;
