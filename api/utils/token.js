@@ -19,7 +19,7 @@ const verifyToken = (token) => {
   });
 };
 
-const verifyUser = async (req, res, next) => {
+const verifyAdmin = async (req, res, next) => {
   try {
     const decoded = await verifyToken(req.headers.authorization.split(" ")[1]);
     req.userId = decoded.id;
@@ -36,5 +36,5 @@ const verifyUser = async (req, res, next) => {
 module.exports = {
   generateToken,
   verifyToken,
-  verifyUser,
+  verifyAdmin,
 };

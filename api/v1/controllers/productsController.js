@@ -12,9 +12,12 @@ const createProduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  let { page, pageSize } = req.query;
+  let { page, pageSize, status } = req.query;
   try {
     const products = await prisma.product.findMany({
+      where:{
+        status,
+      },
       orderBy: { name: "asc" },
       skip: parseInt((page - 1) * pageSize) || 0,
       take: parseInt(pageSize) || 10,
